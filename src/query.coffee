@@ -1,4 +1,5 @@
 q = require 'q'
+_ = require 'lodash'
 
 class Query
     constructor: (@db) ->
@@ -28,6 +29,12 @@ class Query
         @db.query success, options
         deferred.promise
 
+# Object.defineProperty Query.prototype, 'index',
+#     set: (range) ->
+#         # if range instanceof Array
+#         #     [@lower, @upper] = range
+#         # else @lower = @upper = range
+
 Object.defineProperty Query.prototype, 'range',
     set: (range) ->
         if range instanceof Array
@@ -38,13 +45,22 @@ Object.defineProperty Query.prototype, 'range',
 
 Object.defineProperty Query.prototype, 'sort',
     set: (sort) ->
-        switch
-            when typeof sort is 'string'
-                m = sort.match /(\+|\-).+/g
-                @order = 'DESC' if m[1] is '-' or sort.match /^des/gi
-            when sort is -1
-                @order = 'DESC'
-            else @order = 'ASC'
+        parse = (sort) =>
+            switch
+                when typeof sort is 'string'
+                    m = sort.match /(\+|\-)(.*)/i
+                    if m?
+                        @index = m[2]
+                        @order = 'DESC' if m[1] is '-' or sort.match /^des/gi
+                when sort is -1
+                    @order = 'DESC'
+                when typeof sort is 'object'
+                    throw new Error 'INVALID_SORT_KEY' if sort.length > 1
+                    keys = _.keys sort
+                    @index = keys[0]
+                    parse sort[@index]
+                else @order = 'ASC'
+        parse sort
 
     get: ->
         @order

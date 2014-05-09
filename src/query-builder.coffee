@@ -5,11 +5,17 @@ Query = require './query'
 class QueryBuilder
     constructor: (db, @transforms = []) ->
         @query = new Query db
+
     exec = ->
         @query.exec()
         .then (results) =>
             results = results[0] || null if @one # Returns only one object for findOne()
             results
+
+    sort = (sort) ->
+        @query.sort = sort
+        exec: exec.bind @
+
     find: (args...) ->
         ### Usage:
             db.find('username', 'fwz')
@@ -46,9 +52,11 @@ class QueryBuilder
                     throw new Error 'QueryBuilder is limited to one key per query'
 
                 @query.index = keys[0] if keys.length
-                @query.range = object[@query.index]
+                @query.range = object[@query.index] if keys.length
 
-        { exec: exec.bind @ }
+        exec: exec.bind @
+        sort: sort.bind @
+
     findOne: (args...) ->
         @one = yes
         @query.limit = 1
