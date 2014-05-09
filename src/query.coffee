@@ -48,10 +48,8 @@ Object.defineProperty Query.prototype, 'sort',
         parse = (sort) =>
             switch
                 when typeof sort is 'string'
-                    m = sort.match /(\+|\-)(.*)/i
-                    if m?
-                        @index = m[2]
-                        @order = 'DESC' if m[1] is '-' or sort.match /^des/gi
+                    m = sort.match /[^\-\+]+/i
+                    @order = 'DESC' if sort[0] is '-' or sort.match /^des/gi
                 when sort is -1
                     @order = 'DESC'
                 when typeof sort is 'object'

@@ -93,7 +93,7 @@ describe 'QueryBuilder', ->
                 transaction.exec()
                 .then (result) ->
                     expect result
-                    .toEqual _.first people
+                    .toEqual people[0]
                     done()
                 .catch (err) -> throw err
 
@@ -123,7 +123,7 @@ describe 'QueryBuilder', ->
                 transaction.exec()
                 .then (result) ->
                     expect result.age
-                    .toEqual 23
+                    .toEqual _.last(people).age
                     done()
                 .catch (err) -> throw err
 
@@ -137,7 +137,7 @@ describe 'QueryBuilder', ->
                     .toEqual people.length
 
                     expect result[0].age
-                    .toEqual 23
+                    .toEqual _.last(people).age
                     done()
                 .catch (err) -> throw err
 
@@ -150,6 +150,28 @@ describe 'QueryBuilder', ->
                     .toEqual people.length
 
                     expect result[0].age
-                    .toEqual 23
+                    .toEqual _.last(people).age
+                    done()
+                .catch (err) -> throw err
+
+        describe 'find().sort({ age: "DESC" })', ->
+            it 'should return an array of people in reverse order', (done) ->
+                transaction = db.find().sort({ age: "DESC" })
+                transaction.exec()
+                .then (result) ->
+                    expect result[0].age
+                    .toEqual _.last(people).age
+
+                    done()
+                .catch (err) -> throw err
+
+        describe 'find().sort("DESC")', ->
+            it 'should return an array of people in reverse order', (done) ->
+                transaction = db.find().sort("DESC")
+                transaction.exec()
+                .then (result) ->
+                    expect result[0]
+                    .toEqual _.last people
+
                     done()
                 .catch (err) -> throw err
