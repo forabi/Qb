@@ -123,13 +123,13 @@ describe 'QueryBuilder', ->
                 transaction.exec()
                 .then (result) ->
                     expect result.age
-                    .toEqual _.last(people).age
+                    .toEqual _.chain(people).sortBy('age').last().value().age
                     done()
                 .catch (err) -> throw err
 
     describe 'sort()', ->
         describe 'find().sort("-age")', ->
-            it 'should return an array of people sorted by age in reverse order', (done) ->
+            it 'should return an array of people sorted by age descending', (done) ->
                 transaction = db.find().sort('-age')
                 transaction.exec()
                 .then (result) ->
@@ -137,12 +137,12 @@ describe 'QueryBuilder', ->
                     .toEqual people.length
 
                     expect result[0].age
-                    .toEqual _.last(people).age
+                    .toEqual _.chain(people).sortBy('age').last().value().age
                     done()
                 .catch (err) -> throw err
 
         describe 'find().sort({ age: -1 })', ->
-            it 'should return an array of people sorted by age in reverse order', (done) ->
+            it 'should return an array of people sorted by age descending', (done) ->
                 transaction = db.find().sort({ age: -1 })
                 transaction.exec()
                 .then (result) ->
@@ -150,17 +150,28 @@ describe 'QueryBuilder', ->
                     .toEqual people.length
 
                     expect result[0].age
-                    .toEqual _.last(people).age
+                    .toEqual _.chain(people).sortBy('age').last().value().age
                     done()
                 .catch (err) -> throw err
 
         describe 'find().sort({ age: "DESC" })', ->
-            it 'should return an array of people in reverse order', (done) ->
+            it 'should return an array of people sorted by age descending', (done) ->
                 transaction = db.find().sort({ age: "DESC" })
                 transaction.exec()
                 .then (result) ->
                     expect result[0].age
-                    .toEqual _.last(people).age
+                    .toEqual _.chain(people).sortBy('age').last().value().age
+
+                    done()
+                .catch (err) -> throw err
+
+        describe 'find("age").sort("DESC")', ->
+            it 'should return an array of people sorted by age descending', (done) ->
+                transaction = db.find("age").sort("DESC")
+                transaction.exec()
+                .then (result) ->
+                    expect result[0].age
+                    .toEqual _.chain(people).sortBy('age').last().value().age
 
                     done()
                 .catch (err) -> throw err
