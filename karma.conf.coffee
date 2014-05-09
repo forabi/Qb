@@ -1,10 +1,12 @@
 module.exports = (config) ->
   config.set
+    reporters: ['spec']
     frameworks: ['jasmine', 'browserify']
     browsers: ['Chrome']
     autoWatch: yes
 
     plugins: [
+        'karma-spec-reporter'
         'karma-browserify'
         # 'karma-coffee-preprocessor'
         'karma-chrome-launcher'
