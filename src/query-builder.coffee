@@ -5,6 +5,11 @@ Query = require './query'
 class QueryBuilder
     constructor: (db, @transforms = []) ->
         @query = new Query db
+    exec = ->
+        @query.exec()
+        .then (results) =>
+            results = results[0] || null if @one # Returns only one object for findOne()
+            results
     find: (args...) ->
         ### Usage:
             db.find('username', 'fwz')
@@ -43,6 +48,10 @@ class QueryBuilder
                 @query.index = keys[0] if keys.length
                 @query.range = object[@query.index]
 
-        @query
+        { exec: exec.bind @ }
+    findOne: (args...) ->
+        @one = yes
+        @query.limit = 1
+        @find args...
 
 module.exports = QueryBuilder

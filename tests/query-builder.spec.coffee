@@ -26,7 +26,7 @@ describe 'QueryBuilder', ->
         store.onStoreReady = ->
             db =
                 find: (args...) -> (new QueryBuilder(store)).find args...
-                # findOne: (args...) -> (new QueryBuilder(store)).findOne args...
+                findOne: (args...) -> (new QueryBuilder(store)).findOne args...
                 # findById: (args...) -> (new QueryBuilder(store)).findById args...
                 # findOneById: (args...) -> (new QueryBuilder(store)).findOneById args...
                 # where: (args...) -> (new QueryBuilder(store)).where args...
@@ -39,7 +39,7 @@ describe 'QueryBuilder', ->
     it 'should have a find method', ->
         expect(db.find).toBeDefined()
 
-    describe 'find()', () ->
+    describe 'find()', ->
         describe 'find()', ->
             it 'should get an array of all people', (done) ->
                 transaction = db.find('_id')
@@ -83,5 +83,16 @@ describe 'QueryBuilder', ->
                 .then (result) ->
                     expect result[0].age
                     .toEqual 22
+                    done()
+                .catch (err) -> throw err
+
+    describe 'findOne()', ->
+        describe 'findOne()', ->
+            it 'should return the first person as object (not array)', (done) ->
+                transaction = db.findOne()
+                transaction.exec()
+                .then (result) ->
+                    expect result
+                    .toEqual (_id: 1, username: 'fwz', age: 21)
                     done()
                 .catch (err) -> throw err
