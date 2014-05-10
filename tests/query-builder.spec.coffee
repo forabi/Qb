@@ -9,11 +9,9 @@ IDBStore = require 'idb-wrapper'
 _ = require 'lodash'
 
 describe 'QueryBuilder', ->
-    store = undefined
-    db = undefined
 
     beforeEach (done) ->
-        store = new IDBStore
+        @store = new IDBStore
             storeName: 'people'
             keyPath: '_id'
             autoIncrement: no
@@ -23,26 +21,26 @@ describe 'QueryBuilder', ->
                     (name: 'age')
                     ]
 
-        store.onStoreReady = ->
-            db =
-                find: (args...) -> (new QueryBuilder(store)).find args...
-                findOne: (args...) -> (new QueryBuilder(store)).findOne args...
-                # findById: (args...) -> (new QueryBuilder(store)).findById args...
-                # findOneById: (args...) -> (new QueryBuilder(store)).findOneById args...
-                # where: (args...) -> (new QueryBuilder(store)).where args...
+        @store.onStoreReady = =>
+            @db =
+                find: (args...) => (new QueryBuilder(@store)).find args...
+                findOne: (args...) => (new QueryBuilder(@store)).findOne args...
+                # findById: (args...) -> (new QueryBuilder(@store)).findById args...
+                # findOneById: (args...) -> (new QueryBuilder(@store)).findOneById args...
+                # where: (args...) -> (new QueryBuilder(@store)).where args...
 
-            store.putBatch people, done
+            @store.putBatch people, done
 
     beforeEach ->
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000
 
     it 'should have a find method', ->
-        expect(db.find).toBeDefined()
+        expect(@db.find).toBeDefined()
 
     describe 'find()', ->
         describe 'find()', ->
             it 'should get an array of all people', (done) ->
-                transaction = db.find('_id')
+                transaction = @db.find('_id')
                 transaction.exec()
                 .then (result) ->
                     expect result
@@ -53,7 +51,7 @@ describe 'QueryBuilder', ->
 
         describe 'find({ sort: -1 })', ->
             it 'should get an array of all people in reverse order', (done) ->
-                transaction = db.find({ sort: -1 })
+                transaction = @db.find({ sort: -1 })
                 transaction.exec()
                 .then (result) ->
                     expect result[0]._id
@@ -64,7 +62,7 @@ describe 'QueryBuilder', ->
 
         describe 'find({ _id: [1, 2], sort: -1 })', ->
             it 'should get an array of first 2 people in reverse order', (done) ->
-                transaction = db.find({ _id: [1, 2], sort: -1 })
+                transaction = @db.find({ _id: [1, 2], sort: -1 })
                 transaction.exec()
                 .then (result) ->
                     expect result.length
@@ -78,7 +76,7 @@ describe 'QueryBuilder', ->
 
         describe 'Non-primary index: find("age", 22)', ->
             it 'should get an array with 1 person whose age is 22', (done) ->
-                transaction = db.find('age', 22)
+                transaction = @db.find('age', 22)
                 transaction.exec()
                 .then (result) ->
                     expect result[0].age
@@ -89,7 +87,7 @@ describe 'QueryBuilder', ->
     describe 'findOne()', ->
         describe 'findOne()', ->
             it 'should return the first person as object (not array)', (done) ->
-                transaction = db.findOne()
+                transaction = @db.findOne()
                 transaction.exec()
                 .then (result) ->
                     expect result
@@ -99,7 +97,7 @@ describe 'QueryBuilder', ->
 
         describe 'findOne({age: 22})', ->
             it 'should return the first person whose age is 22', (done) ->
-                transaction = db.findOne({age: 22})
+                transaction = @db.findOne({age: 22})
                 transaction.exec()
                 .then (result) ->
                     expect result.age
@@ -109,7 +107,7 @@ describe 'QueryBuilder', ->
 
         describe 'findOne({sort: -1})', ->
             it 'should return the last person as object (not array)', (done) ->
-                transaction = db.findOne({sort: -1})
+                transaction = @db.findOne({sort: -1})
                 transaction.exec()
                 .then (result) ->
                     expect result
@@ -119,7 +117,7 @@ describe 'QueryBuilder', ->
 
         describe 'findOne({sort: "-age"})', ->
             it 'should return the oldest person', (done) ->
-                transaction = db.findOne({sort: "-age"})
+                transaction = @db.findOne({sort: "-age"})
                 transaction.exec()
                 .then (result) ->
                     expect result.age
@@ -130,7 +128,7 @@ describe 'QueryBuilder', ->
     describe 'sort()', ->
         describe 'find().sort("-age")', ->
             it 'should return an array of people sorted by age descending', (done) ->
-                transaction = db.find().sort('-age')
+                transaction = @db.find().sort('-age')
                 transaction.exec()
                 .then (result) ->
                     expect result.length
@@ -143,7 +141,7 @@ describe 'QueryBuilder', ->
 
         describe 'find().sort({ age: -1 })', ->
             it 'should return an array of people sorted by age descending', (done) ->
-                transaction = db.find().sort({ age: -1 })
+                transaction = @db.find().sort({ age: -1 })
                 transaction.exec()
                 .then (result) ->
                     expect result.length
@@ -156,7 +154,7 @@ describe 'QueryBuilder', ->
 
         describe 'find().sort({ age: "DESC" })', ->
             it 'should return an array of people sorted by age descending', (done) ->
-                transaction = db.find().sort({ age: "DESC" })
+                transaction = @db.find().sort({ age: "DESC" })
                 transaction.exec()
                 .then (result) ->
                     expect result[0].age
@@ -167,7 +165,7 @@ describe 'QueryBuilder', ->
 
         describe 'find("age").sort("DESC")', ->
             it 'should return an array of people sorted by age descending', (done) ->
-                transaction = db.find("age").sort("DESC")
+                transaction = @db.find("age").sort("DESC")
                 transaction.exec()
                 .then (result) ->
                     expect result[0].age
@@ -178,7 +176,7 @@ describe 'QueryBuilder', ->
 
         describe 'find().sort("DESC")', ->
             it 'should return an array of people in reverse order', (done) ->
-                transaction = db.find().sort("DESC")
+                transaction = @db.find().sort("DESC")
                 transaction.exec()
                 .then (result) ->
                     expect result[0]
