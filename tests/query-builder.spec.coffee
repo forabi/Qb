@@ -39,61 +39,71 @@ describe 'QueryBuilder', ->
 
     describe 'find()', ->
         describe 'find()', ->
-            it 'should get an array of all people', (done) ->
-                transaction = @db.find('_id')
-                transaction.exec()
-                .then (result) ->
-                    expect result
-                    .toEqual people
-
+            beforeEach (done) ->
+                @db.find('_id').exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should get an array of all people', ->
+                expect(@result).toEqual people
+
 
         describe 'find({ sort: -1 })', ->
-            it 'should get an array of all people in reverse order', (done) ->
-                transaction = @db.find({ sort: -1 })
-                transaction.exec()
-                .then (result) ->
-                    expect result[0]._id
-                    .toEqual _.last(people)._id
-
+            beforeEach (done) ->
+                @db.find(sort: -1).exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should get an array of all people in reverse order', ->
+                expect(@result[0]._id).toEqual _.last(people)._id
+
 
         describe 'find({ _id: [1, 2], sort: -1 })', ->
-            it 'should get an array of first 2 people in reverse order', (done) ->
-                transaction = @db.find({ _id: [1, 2], sort: -1 })
-                transaction.exec()
-                .then (result) ->
-                    expect result.length
-                    .toEqual 2
-
-                    expect result[0]._id
-                    .toEqual 2
-
+            beforeEach (done) ->
+                @db.find(_id: [1, 2], sort: -1).exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should get an array of first 2 people in reverse order', ->
+                expect(@result.length).toEqual 2
+                expect(@result[0]._id).toEqual 2
+
 
         describe 'Non-primary index: find("age", 22)', ->
-            it 'should get an array with 1 person whose age is 22', (done) ->
-                transaction = @db.find('age', 22)
-                transaction.exec()
-                .then (result) ->
-                    expect result[0].age
-                    .toEqual 22
+            beforeEach (done) ->
+                @db.find('age', 22).exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should get an array with 1 person whose age is 22', ->
+                expect(@result[0].age).toEqual 22
+
 
     describe 'findOne()', ->
         describe 'findOne()', ->
-            it 'should return the first person as object (not array)', (done) ->
-                transaction = @db.findOne()
-                transaction.exec()
-                .then (result) ->
-                    expect result
-                    .toEqual people[0]
+            beforeEach (done) ->
+                @db.findOne().exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should return the first person as object (not array)', ->
+                expect(@result).toEqual people[0]
+
 
         describe 'findOne({age: 22})', ->
             it 'should return the first person whose age is 22', (done) ->
@@ -106,81 +116,99 @@ describe 'QueryBuilder', ->
                 .catch (err) -> throw err
 
         describe 'findOne({sort: -1})', ->
-            it 'should return the last person as object (not array)', (done) ->
-                transaction = @db.findOne({sort: -1})
-                transaction.exec()
-                .then (result) ->
-                    expect result
-                    .toEqual _.last people
+            beforeEach (done) ->
+                @db.findOne(sort: -1).exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
 
+            it 'should return the last person as object (not array)', ->
+                expect(@result).toEqual _.last(people)
+
+
         describe 'findOne({sort: "-age"})', ->
-            it 'should return the oldest person', (done) ->
-                transaction = @db.findOne({sort: "-age"})
-                transaction.exec()
-                .then (result) ->
-                    expect result.age
-                    .toEqual _.chain(people).sortBy('age').last().value().age
+            beforeEach (done) ->
+                @db.findOne(sort: '-age').exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should return the oldest person', ->
+                expect(@result.age)
+                    .toEqual _.chain(people).sortBy('age').last().value().age
+
 
     describe 'sort()', ->
         describe 'find().sort("-age")', ->
-            it 'should return an array of people sorted by age descending', (done) ->
-                transaction = @db.find().sort('-age')
-                transaction.exec()
-                .then (result) ->
-                    expect result.length
-                    .toEqual people.length
-
-                    expect result[0].age
-                    .toEqual _.chain(people).sortBy('age').last().value().age
+            beforeEach (done) ->
+                @db.find().sort('-age').exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should return an array of people sorted by age descending', ->
+                expect(@result.length).toEqual people.length
+                expect(@result[0].age)
+                    .toEqual _.chain(people).sortBy('age').last().value().age
+
 
         describe 'find().sort({ age: -1 })', ->
-            it 'should return an array of people sorted by age descending', (done) ->
-                transaction = @db.find().sort({ age: -1 })
-                transaction.exec()
-                .then (result) ->
-                    expect result.length
-                    .toEqual people.length
-
-                    expect result[0].age
-                    .toEqual _.chain(people).sortBy('age').last().value().age
+            beforeEach (done) ->
+                @db.find().sort(age: -1).exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should return an array of people sorted by age descending', ->
+                expect(@result.length).toEqual people.length
+                expect(@result[0].age)
+                    .toEqual _.chain(people).sortBy('age').last().value().age
+
 
         describe 'find().sort({ age: "DESC" })', ->
-            it 'should return an array of people sorted by age descending', (done) ->
-                transaction = @db.find().sort({ age: "DESC" })
-                transaction.exec()
-                .then (result) ->
-                    expect result[0].age
+            beforeEach (done) ->
+                @db.find().sort(age: 'DESC').exec()
+                .then (result) =>
+                    @result = result
+                    done()
+
+                .catch (err) -> throw err
+
+            it 'should return an array of people sorted by age descending', ->
+                expect(@result[0].age)
                     .toEqual _.chain(people).sortBy('age').last().value().age
 
-                    done()
-                .catch (err) -> throw err
 
         describe 'find("age").sort("DESC")', ->
-            it 'should return an array of people sorted by age descending', (done) ->
-                transaction = @db.find("age").sort("DESC")
-                transaction.exec()
-                .then (result) ->
-                    expect result[0].age
+            beforeEach (done) ->
+                @db.find('age').sort('DESC').exec()
+                .then (result) =>
+                    @result = result
+                    done()
+
+                .catch (err) -> throw err
+
+            it 'should return an array of people sorted by age descending', ->
+                expect(@result[0].age)
                     .toEqual _.chain(people).sortBy('age').last().value().age
 
-                    done()
-                .catch (err) -> throw err
 
         describe 'find().sort("DESC")', ->
-            it 'should return an array of people in reverse order', (done) ->
-                transaction = @db.find().sort("DESC")
-                transaction.exec()
-                .then (result) ->
-                    expect result[0]
-                    .toEqual _.last people
-
+            beforeEach (done) ->
+                @db.find().sort('desc').exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should return an array of people in reverse order', ->
+                expect(@result[0]).toEqual _.last people
