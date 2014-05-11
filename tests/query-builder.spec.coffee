@@ -48,6 +48,7 @@ describe 'QueryBuilder', ->
                 .catch (err) -> throw err
 
             it 'should get an array of all people', ->
+                expect(@result.length).toEqual people.length
                 expect(@result).toEqual people
 
 
@@ -62,6 +63,7 @@ describe 'QueryBuilder', ->
 
             it 'should get an array of all people in reverse order', ->
                 expect(@result[0]._id).toEqual _.last(people)._id
+                expect(@result.length).toEqual people.length
 
 
         describe 'find({ _id: [1, 2], sort: -1 })', ->
@@ -89,6 +91,7 @@ describe 'QueryBuilder', ->
 
             it 'should get an array with 1 person whose age is 22', ->
                 expect(@result[0].age).toEqual 22
+                expect(@result.length).toEqual 1
 
 
     describe 'findOne()', ->
@@ -106,14 +109,17 @@ describe 'QueryBuilder', ->
 
 
         describe 'findOne({age: 22})', ->
-            it 'should return the first person whose age is 22', (done) ->
-                transaction = @db.findOne({age: 22})
-                transaction.exec()
-                .then (result) ->
-                    expect result.age
-                    .toEqual 22
+            beforeEach (done) ->
+                @db.findOne(age: 22).exec()
+                .then (result) =>
+                    @result = result
                     done()
+
                 .catch (err) -> throw err
+
+            it 'should return the first person whose age is 22', ->
+                expect(@result.age).toEqual 22
+
 
         describe 'findOne({sort: -1})', ->
             beforeEach (done) ->
@@ -183,6 +189,7 @@ describe 'QueryBuilder', ->
                 .catch (err) -> throw err
 
             it 'should return an array of people sorted by age descending', ->
+                expect(@result.length).toEqual people.length
                 expect(@result[0].age)
                     .toEqual _.chain(people).sortBy('age').last().value().age
 
@@ -197,6 +204,7 @@ describe 'QueryBuilder', ->
                 .catch (err) -> throw err
 
             it 'should return an array of people sorted by age descending', ->
+                expect(@result.length).toEqual people.length
                 expect(@result[0].age)
                     .toEqual _.chain(people).sortBy('age').last().value().age
 
@@ -211,4 +219,5 @@ describe 'QueryBuilder', ->
                 .catch (err) -> throw err
 
             it 'should return an array of people in reverse order', ->
+                expect(@result.length).toEqual people.length
                 expect(@result[0]).toEqual _.last people
