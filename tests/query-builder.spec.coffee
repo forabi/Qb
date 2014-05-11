@@ -16,10 +16,10 @@ describe 'QueryBuilder', ->
             keyPath: '_id'
             autoIncrement: no
             indexes: [
-                    (name: '_id', unique: yes)
-                    (name: 'username', unique: yes)
-                    (name: 'age')
-                    ]
+                (name: '_id', unique: yes)
+                (name: 'username', unique: yes)
+                (name: 'age')
+            ]
 
         @store.onStoreReady = =>
             @db =
@@ -33,6 +33,7 @@ describe 'QueryBuilder', ->
 
     beforeEach ->
         jasmine.DEFAULT_TIMEOUT_INTERVAL = 5000
+
 
     it 'should have a find method', ->
         expect(@db.find).toBeDefined()

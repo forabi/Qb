@@ -33,3 +33,5 @@ gulp.task 'test', ->
     .on 'error', (err) ->
         # console.log err
         throw err
+
+gulp.watch(['{src,tests}/**.coffee', '*.coffee'], ['test'])
