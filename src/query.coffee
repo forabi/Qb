@@ -1,7 +1,22 @@
 q = require 'q'
 _ = require 'lodash'
 
+parseSort = (sort) ->
+        switch
+            when _.isString sort
+                m = sort.match /[^\-\+]+/i
+                @order = 'DESC' if sort[0] is '-' or sort.match /^des/gi
+            when sort is -1
+                @order = 'DESC'
+            when _.isPlainObject sort
+                throw new Error 'INVALID_SORT_KEY' if sort.length > 1
+                keys = _.keys sort
+                @index = keys[0]
+                parseSort.call @, sort[@index]
+            else @order = 'ASC'
+
 class Query
+
     constructor: (@db) ->
     order: 'ASC'
     exclude: [no, no]
@@ -29,36 +44,23 @@ class Query
         @db.query success, options
         deferred.promise
 
-# Object.defineProperty Query.prototype, 'index',
+# Object.defineProperty Query::, 'index',
 #     set: (range) ->
 #         # if range instanceof Array
 #         #     [@lower, @upper] = range
 #         # else @lower = @upper = range
 
-Object.defineProperty Query.prototype, 'range',
+Object.defineProperty Query::, 'range',
     set: (range) ->
-        if range instanceof Array
+        if _.isArray range
             [@lower, @upper] = range
         else @lower = @upper = range
     get: ->
         [@lower, @upper]
 
-Object.defineProperty Query.prototype, 'sort',
+Object.defineProperty Query::, 'sort',
     set: (sort) ->
-        parse = (sort) =>
-            switch
-                when typeof sort is 'string'
-                    m = sort.match /[^\-\+]+/i
-                    @order = 'DESC' if sort[0] is '-' or sort.match /^des/gi
-                when sort is -1
-                    @order = 'DESC'
-                when typeof sort is 'object'
-                    throw new Error 'INVALID_SORT_KEY' if sort.length > 1
-                    keys = _.keys sort
-                    @index = keys[0]
-                    parse sort[@index]
-                else @order = 'ASC'
-        parse sort
+        parseSort.call @, sort
 
     get: ->
         @order

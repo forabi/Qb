@@ -16,8 +16,7 @@ if config.env isnt 'production'
 config = "dist/#{config.env}"
 
 
-try
-    fs.mkdirSync cofig.dest
+try fs.mkdirSync cofig.dest
 
 gulp.task 'build', ->
     gulp.src config.src.coffee, cwd: 'src'

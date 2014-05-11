@@ -10,7 +10,7 @@ module.exports = (config) ->
         'karma-browserify'
         # 'karma-coffee-preprocessor'
         'karma-chrome-launcher'
-        # 'karma-firefox-launcher'
+        'karma-firefox-launcher'
         # 'karma-phantomjs-launcher'
         'karma-jasmine'
     ]
